@@ -34,7 +34,12 @@ public class SJDB {
         Optimiser opt = new Optimiser(cat);
         Operator optPlan = opt.optimise(plan);
 
-        System.out.println(optPlan.getOutput());
+        est = new Estimator();
+        optPlan.accept(est);
+        System.out.println(est.getValue());
+
+//        Inspector inspector = new Inspector();
+//        optPlan.accept(inspector);
     }
 
 }

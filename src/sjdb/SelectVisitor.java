@@ -17,6 +17,7 @@ public class SelectVisitor implements PlanVisitor {
 
     @Override
     public void visit(Scan op) {
+//        System.out.println("initial selectss " + selects);
 //        System.out.println("VISIT SCAN:");
         NamedRelation relation = relationOrder.pop();
         Scan newScan = new Scan(relation);
@@ -87,6 +88,7 @@ public class SelectVisitor implements PlanVisitor {
         Operator left = operators.pop();
         Product newProduct = new Product(left, right);
         estimator.visit(newProduct);
+
         operators.push(newProduct);
 
         Iterator<Select> iter = selects.iterator();
@@ -128,7 +130,6 @@ public class SelectVisitor implements PlanVisitor {
         for (int i = indices.size() - 1; i >= 0; i--) {
             selects.remove((int) indices.get(i));
         }
-//        System.out.println(operators);
     }
 
     @Override

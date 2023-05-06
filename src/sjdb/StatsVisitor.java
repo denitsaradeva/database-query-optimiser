@@ -46,8 +46,12 @@ public class StatsVisitor implements PlanVisitor {
 
         selects.add(op);
 
-        attributes.add(op.getPredicate().getLeftAttribute());
-        attributes.add(op.getPredicate().getRightAttribute());
+        if (op.getPredicate().getLeftAttribute() != null) {
+            attributes.add(op.getPredicate().getLeftAttribute());
+        }
+        if (op.getPredicate().getRightAttribute() != null) {
+            attributes.add(op.getPredicate().getRightAttribute());
+        }
     }
 
     @Override

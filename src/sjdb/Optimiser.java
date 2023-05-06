@@ -1,6 +1,7 @@
 package sjdb;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 public class Optimiser {
@@ -27,12 +28,11 @@ public class Optimiser {
         //Getting all relations, selects, and attributes
         StatsVisitor statsVisitor = new StatsVisitor(estimator);
         root.accept(statsVisitor);
-        determineRelationOrder(statsVisitor);
         selects = statsVisitor.getSelects();
-//
-//        System.out.println(relations);
-//        System.out.println("----");
-//        System.out.println(selects);
+        determineRelationOrder(statsVisitor);
+        operators = new ArrayList<>(statsVisitor.getAttributes());
+
+//        generatePermutations(relations, new Stack<>(), permutations);
 
         //pushes selects down the tree
         SelectVisitor selectVisitor = new SelectVisitor(relations, selects, estimator);
@@ -44,15 +44,11 @@ public class Optimiser {
 
         //gathering all attributes after the new changes
         joinVisitor.getRoot().accept(statsVisitor);
-        operators = statsVisitor.getAttributes();
 
         //pushes projects down the tree
         ProjectVisitor projectVisitor = new ProjectVisitor(operators, estimator);
         joinVisitor.getRoot().accept(projectVisitor);
 
-        for (Operator input : projectVisitor.getRoot().getInputs()) {
-            System.out.println(input);
-        }
 
         return projectVisitor.getRoot();
     }
@@ -67,4 +63,21 @@ public class Optimiser {
         relations.addAll(relationList);
     }
 
+
+//    private static void generatePermutations(List<NamedRelation> relations, List<NamedRelation> currentPermutation,
+//                                             List<List<NamedRelation>> permutations) {
+//        if (currentPermutation.size() == relations.size()) {
+//            permutations.add(new ArrayList<>(currentPermutation));
+//            return;
+//        }
+//
+//        for (NamedRelation relation : relations) {
+//            if (currentPermutation.contains(relation)) {
+//                continue;
+//            }
+//            currentPermutation.add(relation);
+//            generatePermutations(relations, currentPermutation, permutations);
+//            currentPermutation.remove(currentPermutation.size() - 1);
+//        }
+//    }
 }

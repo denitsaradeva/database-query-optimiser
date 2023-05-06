@@ -24,12 +24,12 @@ public class JoinVisitor implements PlanVisitor {
     @Override
     public void visit(Project op) {
         //ignore for this step
-        System.out.println("VISIT PROJECT:");
+//        System.out.println("VISIT PROJECT:");
         Operator previous = operators.pop();
         Project newProject = new Project(previous, op.getAttributes());
         estimator.visit(newProject);
         operators.push(newProject);
-        System.out.println(operators);
+//        System.out.println(operators);
     }
 
     @Override

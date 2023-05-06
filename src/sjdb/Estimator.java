@@ -7,6 +7,10 @@ import java.util.Stack;
 
 public class Estimator implements PlanVisitor {
 
+    int cost = 0;
+
+    int prevCost = 0;
+
     public Estimator() {
         // empty constructor
     }
@@ -35,9 +39,11 @@ public class Estimator implements PlanVisitor {
         Iterator<Attribute> iter = input.iterator();
         while (iter.hasNext()) {
             Attribute current = iter.next();
-//            System.out.println(current.getName());
-//            System.out.println(op.getInput().getOutput().getAttribute(current).getValueCount());
-            output.addAttribute(new Attribute(current.getName(), op.getInput().getOutput().getAttribute(current).getValueCount()));
+
+//            System.out.println(current);
+//            System.out.println("-- " + op.getInput().getOutput().getAttributes());
+            output.addAttribute(new Attribute(current.getName(),
+                    op.getInput().getOutput().getAttribute(current).getValueCount()));
         }
 
         op.setOutput(output);
@@ -69,6 +75,9 @@ public class Estimator implements PlanVisitor {
                 }
             }
         } else {
+//            System.out.println(rightAttr);
+//            System.out.println(leftAttr);
+//            System.out.println(output.getAttributes());
             newRight = new Attribute(rightAttr.getName()
                     , Math.min(output.getAttribute(rightAttr).getValueCount(), output.getAttribute(leftAttr).getValueCount()));
 
@@ -90,6 +99,9 @@ public class Estimator implements PlanVisitor {
                 }
             }
         }
+
+        cost += updatedOutput.getTupleCount();
+        prevCost = updatedOutput.getTupleCount();
         op.setOutput(updatedOutput);
     }
 
@@ -106,18 +118,14 @@ public class Estimator implements PlanVisitor {
             output.addAttribute(new Attribute(right.next()));
         }
 
+        cost += output.getTupleCount();
+        prevCost = output.getTupleCount();
         op.setOutput(output);
     }
 
     public void visit(Join op) {
         Attribute leftPred = op.getPredicate().getLeftAttribute();
         Attribute rightPred = op.getPredicate().getRightAttribute();
-//
-//        System.out.println("right: " + rightPred);
-//        System.out.println("left: " + leftPred);
-//
-//        System.out.println(op.getInputs().get(0).getOutput().getAttributes());
-//        System.out.println(op.getInputs().get(1).getOutput().getAttributes());
 
         Relation output = new Relation(((op.getInputs().get(0).getOutput().getTupleCount())
                 * (op.getInputs().get(1).getOutput().getTupleCount())
@@ -144,8 +152,15 @@ public class Estimator implements PlanVisitor {
             output.addAttribute(updatedAttr);
         }
 
+        cost += output.getTupleCount();
+        prevCost = output.getTupleCount();
+
         op.setOutput(output);
 
+    }
+
+    public int getValue() {
+        return cost - prevCost;
     }
 
 
